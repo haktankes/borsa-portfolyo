@@ -2,7 +2,7 @@ name: Daily Portfolio Notify
 
 on:
   schedule:
-    - cron: "0 6 * * 1-5"  # Her hafta içi 09:00 TR saati (UTC+3)
+    - cron: "45 7 * * 1-5"  # Her hafta içi 10:45 TR saati (UTC+3)
   workflow_dispatch:         # Manuel tetikleme için
 
 jobs:
