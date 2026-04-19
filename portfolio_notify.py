@@ -147,11 +147,6 @@ def build_message(rows, usd_try, dun_toplam=None):
         emoji = "🟢" if r["kar_pct"] >= 0 else "🔴"
         msg += f"{emoji} {r['ticker']}: %{r['kar_pct']:+.1f} kar | ⬆ %{r['upside']:.1f} upside\n"
 
-    yuksek = sorted([r for r in valid if r["upside"] > 50], key=lambda x: x["upside"], reverse=True)
-    msg += "\n━━━━━━━━━━━━━━━━\n"
-    msg += "📌 *HEDEF FİYAT DURUMU* (Upside > %50)\n"
-    msg += "".join(f"⭐ {r['ticker']}: %{r['upside']:.1f} potansiyel\n" for r in yuksek) or "Yok\n"
-
     return msg
 
 
