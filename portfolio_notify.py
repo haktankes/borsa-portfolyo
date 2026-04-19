@@ -113,9 +113,9 @@ def build_message(rows, usd_try, dun_toplam=None):
     pct_h = 100 * toplam_hisse  / toplam if toplam else 0
     pct_k = 100 * toplam_kripto / toplam if toplam else 0
 
-    sorted_v = sorted(valid, key=lambda x: x["kar_pct"], reverse=True)
-    en_iyi  = sorted_v[:3]
-    en_kotu = sorted_v[-3:]
+    sorted_hisse = sorted(hisse, key=lambda x: x["kar_pct"], reverse=True)
+    en_iyi  = sorted_hisse[:3]
+    en_kotu = sorted_hisse[-3:]
 
     if dun_toplam and dun_toplam > 0:
         fark = toplam - dun_toplam
