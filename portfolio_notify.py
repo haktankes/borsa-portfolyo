@@ -3,7 +3,10 @@ import os
 import csv
 import io
 import re
+import json
 from datetime import datetime
+
+LAST_VALUE_FILE = "last_value.json"
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 CHAT_ID = os.environ.get("CHAT_ID", "")
@@ -85,7 +88,20 @@ def get_portfolio():
     return rows
 
 
-def build_message(rows, usd_try):
+def load_last_value():
+    try:
+        with open(LAST_VALUE_FILE, "r") as f:
+            return json.load(f).get("toplam", None)
+    except Exception:
+        return None
+
+
+def save_last_value(toplam):
+    with open(LAST_VALUE_FILE, "w") as f:
+        json.dump({"toplam": toplam, "tarih": datetime.now().strftime("%Y-%m-%d")}, f)
+
+
+def build_message(rows, usd_try, dun_toplam=None):
     now = datetime.now().strftime("%d.%m.%Y %H:%M")
     valid = [r for r in rows if r["val_tl"] > 5]
     toplam = sum(r["val_tl"] for r in valid)
@@ -101,12 +117,20 @@ def build_message(rows, usd_try):
     en_iyi  = sorted_v[:3]
     en_kotu = sorted_v[-3:]
 
+    if dun_toplam and dun_toplam > 0:
+        fark = toplam - dun_toplam
+        fark_pct = 100 * fark / dun_toplam
+        fark_emoji = "🟢" if fark >= 0 else "🔴"
+        gunluk_str = f"\n{fark_emoji} Günlük: `{fark:+,.0f} TRY` (%{fark_pct:+.2f})"
+    else:
+        gunluk_str = ""
+
     msg = f"""📊 *PORTFOLYO RAPORU*
 🕘 {now} | 💱 1 USD = {usd_try:.1f} TRY
 
 ━━━━━━━━━━━━━━━━
 💼 *TOPLAM DEĞER*
-`{toplam:,.0f} TRY`
+`{toplam:,.0f} TRY`{gunluk_str}
 
 🏦 Hisse:  `{toplam_hisse:,.0f} TRY` (%{pct_h:.1f})
 🪙 Kripto: `{toplam_kripto:,.0f} TRY` (%{pct_k:.1f})
@@ -140,7 +164,11 @@ def send_telegram(message):
 def main():
     usd_try = get_usd_try()
     rows = get_portfolio()
-    message = build_message(rows, usd_try)
+    dun_toplam = load_last_value()
+    message = build_message(rows, usd_try, dun_toplam)
+    valid = [r for r in rows if r["val_tl"] > 5]
+    toplam = sum(r["val_tl"] for r in valid)
+    save_last_value(toplam)
     print(message)
     send_telegram(message)
     print("Bildirim gönderildi.")

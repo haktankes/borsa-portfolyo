@@ -24,3 +24,11 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: python portfolio_notify.py
+
+      - name: Günlük değeri kaydet
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add last_value.json || true
+          git diff --cached --quiet || git commit -m "chore: günlük portfolyo değeri güncellendi"
+          git push || true
