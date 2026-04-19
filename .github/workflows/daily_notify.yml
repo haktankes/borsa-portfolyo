@@ -1,0 +1,26 @@
+name: Daily Portfolio Notify
+
+on:
+  schedule:
+    - cron: "0 6 * * 1-5"  # Her hafta içi 09:00 TR saati (UTC+3)
+  workflow_dispatch:         # Manuel tetikleme için
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Bağımlılıkları yükle
+        run: pip install requests
+
+      - name: Portfolyo bildirimini gönder
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python portfolio_notify.py
