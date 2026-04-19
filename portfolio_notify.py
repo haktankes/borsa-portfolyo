@@ -4,7 +4,9 @@ import csv
 import io
 import re
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+TR_TZ = timezone(timedelta(hours=3))
 
 LAST_VALUE_FILE = "last_value.json"
 
@@ -102,7 +104,7 @@ def save_last_value(toplam):
 
 
 def build_message(rows, usd_try, dun_toplam=None):
-    now = datetime.now().strftime("%d.%m.%Y %H:%M")
+    now = datetime.now(TR_TZ).strftime("%d.%m.%Y %H:%M")
     valid = [r for r in rows if r["val_tl"] > 5]
     toplam = sum(r["val_tl"] for r in valid)
 
